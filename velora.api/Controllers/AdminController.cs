@@ -1,0 +1,279 @@
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using velora.core.Data;
+using velora.repository.Specifications.ProductSpecs;
+using velora.services.Services.AdminService;
+using velora.services.Services.AuthService.Dto;
+using velora.services.Services.ProductService;
+using velora.services.Services.ProductService.Dto;
+
+namespace velora.api.Controllers
+{
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    public class AdminController : APIBaseController
+    {
+        private readonly IAdminService _adminService;
+        private readonly IProductService _productService;
+
+        public AdminController(IAdminService adminService, IProductService productService)
+        {
+            _adminService = adminService;
+            _productService = productService;
+        }
+
+
+        #region Products
+        [HttpGet("get-products")]
+        public async Task<IActionResult> GetProducts([FromQuery] ProductSpecification filters)
+        {
+            var products = await _productService.GetAllProductsAsync(filters);
+            var count = await _productService.GetTotalCountAsync(filters);
+
+            var response = new
+            {
+                pageIndex = filters.PageIndex,
+                pageSize = filters.PageSize,
+                count,
+                data = products
+            };
+
+            return Ok(response);
+        }
+
+        [HttpGet("get-product/{id}")]
+        public async Task<IActionResult> GetProduct(int id)
+        {
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null) return NotFound();
+
+            return Ok(product);
+        }
+
+        [HttpPost("create-product")]
+        public async Task<IActionResult> CreateProduct([FromBody] ProductDto productDto)
+        {
+            if (productDto == null)
+            {
+                return BadRequest("Product data is required.");
+            }
+
+            var product = await _productService.CreateProductAsync(productDto);
+
+            if (product == null)
+            {
+                return BadRequest("Error creating product.");
+            }
+
+            return Ok(new { Message = "Product created successfully.", Product = product });
+        }
+
+        [HttpPut("update-product/{id}")]
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductDto productDto)
+        {
+            if (productDto == null)
+            {
+                return BadRequest("Product data is required.");
+            }
+
+            var product = await _productService.UpdateProductAsync(id, productDto);
+
+            if (product == null)
+            {
+                return NotFound("Product not found.");
+            }
+
+            return Ok(new { Message = "Product updated successfully.", Product = product });
+        }
+
+        [HttpPut("update-product-stock/{id}")]
+        public async Task<IActionResult> UpdateProductStock(int id, [FromBody] int stockQuantity)
+        {
+            var success = await _productService.UpdateProductStockAsync(id, stockQuantity);
+
+            if (!success)
+            {
+                return NotFound("Product not found.");
+            }
+
+            return Ok(new { Message = "Product stock updated successfully." });
+        }
+
+        [HttpDelete("delete-product/{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var success = await _productService.DeleteProductAsync(id);
+
+            if (!success)
+            {
+                return NotFound("Product not found.");
+            }
+
+            return Ok(new { Message = "Product deleted successfully." });
+        }
+        #endregion
+
+        #region Sales
+        [HttpGet("sales/total")]
+        public async Task<IActionResult> GetTotalSales()
+        {
+            var result = await _adminService.GetTotalSalesAsync();
+            return Ok(result);
+        }
+
+        [HttpGet("sales/orders/count")]
+        public async Task<IActionResult> GetTotalOrders()
+        {
+            var result = await _adminService.GetTotalOrdersAsync();
+            return Ok(result);
+        }
+
+        [HttpGet("sales/recent-orders")]
+        public async Task<IActionResult> GetRecentOrders()
+        {
+            var result = await _adminService.GetRecentOrdersAsync();
+            return Ok(result);
+        }
+
+        [HttpGet("sales/top-products")]
+        public async Task<IActionResult> GetTopSellingProducts()
+        {
+            var result = await _adminService.GetTopSellingProductsAsync();
+            return Ok(result);
+        }
+        #endregion
+
+
+
+        #region swf
+
+        //// ======== USER MANAGEMENT ========
+
+        //// Create a new user (Admin only)
+        //[HttpPost("create-user")]
+        //public async Task<IActionResult> CreateUser([FromBody] RegisterDto registerDto)
+        //{
+        //    if (registerDto == null)
+        //    {
+        //        return BadRequest("User data is required.");
+        //    }
+
+        //    var user = await _adminService.CreateUser(registerDto);
+
+        //    if (user == null)
+        //    {
+        //        return BadRequest("Error creating user.");
+        //    }
+
+        //    return Ok(new { Message = "User created successfully.", User = user });
+        //}
+
+        //// Update an existing user (Admin only)
+        //[HttpPut("update-user/{userId}")]
+        //public async Task<IActionResult> UpdateUser(int userId, [FromBody] UpdateUserDto updateUserDto)
+        //{
+        //    if (updateUserDto == null)
+        //    {
+        //        return BadRequest("User data is required.");
+        //    }
+
+        //    var user = await _adminService.UpdateUser(userId, updateUserDto);
+
+        //    if (user == null)
+        //    {
+        //        return NotFound("User not found.");
+        //    }
+
+        //    return Ok(new { Message = "User updated successfully.", User = user });
+        //}
+
+        //// Delete a user (Admin only)
+        //[HttpDelete("delete-user/{userId}")]
+        //public async Task<IActionResult> DeleteUser(int userId)
+        //{
+        //    var success = await _adminService.DeleteUser(userId);
+
+        //    if (!success)
+        //    {
+        //        return NotFound("User not found.");
+        //    }
+
+        //    return Ok(new { Message = "User deleted successfully." });
+        //}
+
+        //// Deactivate a user (Admin only)
+        //[HttpPost("deactivate-user/{userId}")]
+        //public async Task<IActionResult> DeactivateUser(int userId)
+        //{
+        //    var success = await _adminService.DeactivateUser(userId);
+
+        //    if (!success)
+        //    {
+        //        return NotFound("User not found.");
+        //    }
+
+        //    return Ok(new { Message = "User deactivated successfully." });
+        //}
+
+        //// Activate a user (Admin only)
+        //[HttpPost("activate-user/{userId}")]
+        //public async Task<IActionResult> ActivateUser(int userId)
+        //{
+        //    var success = await _adminService.ActivateUser(userId);
+
+        //    if (!success)
+        //    {
+        //        return NotFound("User not found.");
+        //    }
+
+        //    return Ok(new { Message = "User activated successfully." });
+        //}
+
+        // List all users (Admin only)
+        //[HttpGet("get-users")]
+        //public async Task<IActionResult> GetUsers()
+        //{
+        //    var users = await _adminService.GetAllUsers();
+
+        //    if (users == null || users.Count == 0)
+        //    {
+        //        return NoContent();
+        //    }
+
+        //    return Ok(users);
+        //}
+
+        //[HttpGet("users")]
+        //public async Task<IActionResult> GetAllUsers()
+        //    => Ok(await _adminService.GetAllUsers());
+
+        //[HttpGet("users/{id}")]
+        //public async Task<IActionResult> GetUserById(string id)
+        //    => Ok(await _adminService.GetUserById(id));
+
+        //[HttpPut("users/{id}/role")]
+        //public async Task<IActionResult> UpdateUserRole(string id, [FromBody] string role)
+        //{
+        //    await _adminService.UpdateUserRole(id, role);
+        //    return NoContent();
+        //}
+
+        //[HttpPut("users/{id}/deactivate")]
+        //public async Task<IActionResult> DeactivateUser(string id)
+        //{
+        //    await _adminService.DeactivateUser(id);
+        //    return NoContent();
+        //}
+        #endregion
+
+
+        [HttpGet("dashboard")]
+        public IActionResult AdminOnly()
+        {
+            return Ok("Hello Admin 👋 — this is your dashboard");
+        }
+
+
+    }
+}

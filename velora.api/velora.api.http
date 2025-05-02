@@ -1,0 +1,6 @@
+@velora.api_HostAddress = http://localhost:5177
+
+GET {{velora.api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
