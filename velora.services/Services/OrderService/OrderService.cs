@@ -104,7 +104,7 @@ namespace velora.services.Services.OrderService
                 CartId = orderDto.CartId,
                 OrderItems = mappedOrderItems,
                 Subtotal = subTotal,
-                PaymentIntentId = cart.PaymentIntentId
+                //PaymentIntentId = cart.PaymentIntentId
             };
 
             try
