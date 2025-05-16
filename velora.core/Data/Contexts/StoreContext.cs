@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using velora.core.Entities;
+using velora.core.Entities.IdentityEntities;
 using velora.core.Entities.OrderEntities;
 
 
@@ -14,19 +15,25 @@ namespace velora.core.Data.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-            base.OnModelCreating(modelBuilder);
-        }
+			modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+			base.OnModelCreating(modelBuilder);
+			modelBuilder.Entity<Feedback>(entity =>
+			{
+				entity.HasIndex(f => f.UserId); // مجرد index بدون علاقة
+			});
+		}
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductBrand> ProductBrands { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<Contacts> ContactsMessages { get; set; }
         public DbSet<DeliveryMethods> DeliveryMethods { get; set; }
+		public DbSet<Feedback> Feedbacks { get; set; }
 
-     
 
 
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+
+		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             foreach (var entry in ChangeTracker.Entries())
             {

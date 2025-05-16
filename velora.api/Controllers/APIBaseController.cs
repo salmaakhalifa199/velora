@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using velora.api.Controllers;
 
 namespace velora.api.Controllers
 {

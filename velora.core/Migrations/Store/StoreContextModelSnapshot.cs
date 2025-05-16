@@ -3,20 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using velora.core.Data.Contexts;
 
 #nullable disable
 
-namespace velora.core.Data.Migrations
+namespace velora.core.Migrations.Store
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20250502100747_EditOrderitemtable")]
-    partial class EditOrderitemtable
+    partial class StoreContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,6 +21,45 @@ namespace velora.core.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Feedback", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Feedbacks");
+                });
 
             modelBuilder.Entity("velora.core.Entities.Contacts", b =>
                 {
@@ -179,7 +215,14 @@ namespace velora.core.Data.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItem");
+                    b.ToTable("OrderItem", t =>
+                        {
+                            t.Property("PictureUrl")
+                                .HasColumnName("OrderItem_PictureUrl");
+
+                            t.Property("ProductName")
+                                .HasColumnName("OrderItem_ProductName");
+                        });
                 });
 
             modelBuilder.Entity("velora.core.Entities.Product", b =>
@@ -361,14 +404,17 @@ namespace velora.core.Data.Migrations
 
                             b1.Property<string>("PictureUrl")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("PictureUrl");
 
                             b1.Property<int>("ProductId")
-                                .HasColumnType("int");
+                                .HasColumnType("int")
+                                .HasColumnName("ProductId");
 
                             b1.Property<string>("ProductName")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("ProductName");
 
                             b1.HasKey("OrderItemId");
 

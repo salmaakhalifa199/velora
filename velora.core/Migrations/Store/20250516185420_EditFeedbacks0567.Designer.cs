@@ -9,11 +9,11 @@ using velora.core.Data.Contexts;
 
 #nullable disable
 
-namespace velora.core.Data.Migrations
+namespace velora.core.Migrations.Store
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20250502075507_EditOrders")]
-    partial class EditOrders
+    [Migration("20250516185420_EditFeedbacks0567")]
+    partial class EditFeedbacks0567
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,48 @@ namespace velora.core.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Feedback", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Feedbacks");
+                });
 
             modelBuilder.Entity("velora.core.Entities.Contacts", b =>
                 {
@@ -65,6 +107,119 @@ namespace velora.core.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ContactsMessages");
+                });
+
+            modelBuilder.Entity("velora.core.Entities.IdentityEntities.Address", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PersonId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId")
+                        .IsUnique();
+
+                    b.ToTable("Address");
+                });
+
+            modelBuilder.Entity("velora.core.Entities.IdentityEntities.Person", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Person");
                 });
 
             modelBuilder.Entity("velora.core.Entities.OrderEntities.DeliveryMethods", b =>
@@ -179,7 +334,14 @@ namespace velora.core.Data.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItem");
+                    b.ToTable("OrderItem", t =>
+                        {
+                            t.Property("PictureUrl")
+                                .HasColumnName("OrderItem_PictureUrl");
+
+                            t.Property("ProductName")
+                                .HasColumnName("OrderItem_ProductName");
+                        });
                 });
 
             modelBuilder.Entity("velora.core.Entities.Product", b =>
@@ -291,6 +453,27 @@ namespace velora.core.Data.Migrations
                     b.ToTable("ProductCategories");
                 });
 
+            modelBuilder.Entity("Feedback", b =>
+                {
+                    b.HasOne("velora.core.Entities.IdentityEntities.Person", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("velora.core.Entities.IdentityEntities.Address", b =>
+                {
+                    b.HasOne("velora.core.Entities.IdentityEntities.Person", "Person")
+                        .WithOne("Address")
+                        .HasForeignKey("velora.core.Entities.IdentityEntities.Address", "PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
             modelBuilder.Entity("velora.core.Entities.OrderEntities.Order", b =>
                 {
                     b.HasOne("velora.core.Entities.OrderEntities.DeliveryMethods", "DeliveryMethod")
@@ -348,7 +531,7 @@ namespace velora.core.Data.Migrations
 
             modelBuilder.Entity("velora.core.Entities.OrderEntities.OrderItem", b =>
                 {
-                    b.HasOne("velora.core.Entities.OrderEntities.Order", null)
+                    b.HasOne("velora.core.Entities.OrderEntities.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -361,14 +544,17 @@ namespace velora.core.Data.Migrations
 
                             b1.Property<string>("PictureUrl")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("PictureUrl");
 
                             b1.Property<int>("ProductId")
-                                .HasColumnType("int");
+                                .HasColumnType("int")
+                                .HasColumnName("ProductId");
 
                             b1.Property<string>("ProductName")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("ProductName");
 
                             b1.HasKey("OrderItemId");
 
@@ -380,6 +566,8 @@ namespace velora.core.Data.Migrations
 
                     b.Navigation("ItemOrdered")
                         .IsRequired();
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("velora.core.Entities.Product", b =>
@@ -399,6 +587,12 @@ namespace velora.core.Data.Migrations
                     b.Navigation("ProductBrand");
 
                     b.Navigation("ProductCategory");
+                });
+
+            modelBuilder.Entity("velora.core.Entities.IdentityEntities.Person", b =>
+                {
+                    b.Navigation("Address")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("velora.core.Entities.OrderEntities.Order", b =>

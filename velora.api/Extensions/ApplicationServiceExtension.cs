@@ -23,6 +23,8 @@ using velora.repository.Cart;
 using velora.services.CacheService;
 using velora.services.Services.OrderService.Dto;
 using velora.services.Services.OrderService;
+using velora.services.Services.FeedbackService;
+using velora.services.Services.UserService.Dto;
 //using velora.services.Services.PaymentService;
 
 namespace velora.api.Extensions
@@ -47,11 +49,15 @@ namespace velora.api.Extensions
             services.AddAutoMapper(typeof(ProductProfile).Assembly);
             services.AddAutoMapper(typeof(AdminProfile).Assembly);
             services.AddAutoMapper(typeof(CartProfile).Assembly);
-            services.AddScoped<ITokenService, TokenService>();
+			services.AddAutoMapper(typeof(FeedbackProfile)); 
+
+			services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IFeedbackRepository, FeedbackRepository>();
+            services.AddScoped<IFeedbackService , FeedbackService>();
 
             services.Configure<ApiBehaviorOptions>(options =>
             {

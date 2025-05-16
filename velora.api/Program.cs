@@ -5,6 +5,7 @@ using velora.api.Helper;
 using System.Text.Json.Serialization;
 using StackExchange.Redis;
 using velora.api.MiddleWares;
+using velora.services.Services.FeedbackService;
 
 namespace velora.api
 {
@@ -14,14 +15,17 @@ namespace velora.api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
             // Add services to the container.
             builder.Services.AddControllers()
                   .AddJsonOptions(options =>
                   {
                       options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                   });
-       
-            builder.Services.AddDbContext<StoreContext>(Options =>
+
+			
+
+			builder.Services.AddDbContext<StoreContext>(Options =>
             {
                 Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });

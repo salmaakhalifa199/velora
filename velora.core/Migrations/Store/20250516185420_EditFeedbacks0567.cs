@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace velora.core.Data.Migrations
+namespace velora.core.Migrations.Store
 {
     /// <inheritdoc />
-    public partial class EditOrderitemtable : Migration
+    public partial class EditFeedbacks0567 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

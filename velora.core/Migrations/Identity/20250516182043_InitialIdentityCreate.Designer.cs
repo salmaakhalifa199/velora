@@ -12,8 +12,8 @@ using velora.core.Data.Contexts;
 namespace velora.core.Migrations.Identity
 {
     [DbContext(typeof(StoreIdentityDBContext))]
-    [Migration("20250426081725_EditPersonTable1")]
-    partial class EditPersonTable1
+    [Migration("20250516182043_InitialIdentityCreate")]
+    partial class InitialIdentityCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -159,6 +159,50 @@ namespace velora.core.Migrations.Identity
                     b.ToTable("UserTokens", "Identity");
                 });
 
+            modelBuilder.Entity("velora.core.Entities.IdentityEntities.Address", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PersonId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId")
+                        .IsUnique();
+
+                    b.ToTable("Address", "Identity");
+                });
+
             modelBuilder.Entity("velora.core.Entities.IdentityEntities.Person", b =>
                 {
                     b.Property<string>("Id")
@@ -289,6 +333,23 @@ namespace velora.core.Migrations.Identity
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("velora.core.Entities.IdentityEntities.Address", b =>
+                {
+                    b.HasOne("velora.core.Entities.IdentityEntities.Person", "Person")
+                        .WithOne("Address")
+                        .HasForeignKey("velora.core.Entities.IdentityEntities.Address", "PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("velora.core.Entities.IdentityEntities.Person", b =>
+                {
+                    b.Navigation("Address")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

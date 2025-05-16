@@ -8,7 +8,7 @@ using velora.core.Data.Contexts;
 
 #nullable disable
 
-namespace velora.repository.Migrations.Identity
+namespace velora.core.Migrations.Identity
 {
     [DbContext(typeof(StoreIdentityDBContext))]
     partial class StoreIdentityDBContextModelSnapshot : ModelSnapshot
