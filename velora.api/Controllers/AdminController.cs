@@ -274,6 +274,11 @@ namespace velora.api.Controllers
             return Ok("Hello Admin 👋 — this is your dashboard");
         }
 
-
-    }
+		[HttpGet("users/count")]
+		public async Task<IActionResult> GetUsersCount()
+		{
+			var count = await _adminService.GetUsersCountAsync();
+			return Ok(new { UsersCount = count });
+		}
+	}
 }

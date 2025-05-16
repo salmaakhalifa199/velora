@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Store.Repository.Interfaces;
 using velora.core.Entities.IdentityEntities;
 using velora.core.Entities.OrderEntities;
@@ -35,9 +36,12 @@ namespace velora.services.Services.AdminService
             _productService = productService;
             _mapper = mapper;
         }
-
-        #region Crud Products
-        public async Task<ApiResponse<ProductDto>> CreateProductAsync(ProductDto productDto)
+		public async Task<int> GetUsersCountAsync()
+		{
+			return await _userManager.Users.CountAsync();
+		}
+		#region Crud Products
+		public async Task<ApiResponse<ProductDto>> CreateProductAsync(ProductDto productDto)
         {
             return await _productService.CreateProductAsync(productDto);
         }

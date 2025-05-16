@@ -1,4 +1,4 @@
-﻿// Services/Services/FeedbackService/FeedbackService.cs
+﻿
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
@@ -28,34 +28,6 @@ namespace velora.services.Services.FeedbackService
 			_mapper = mapper;
 		}
 
-		//public async Task<FeedbackDto> CreateFeedbackAsync(CreateFeedbackDto dto, string? userId = null)
-		//{
-		//	var feedback = new Feedback
-		//	{
-		//		UserId = userId,
-		//		Comment = dto.Comment
-		//	};
-
-		//	if (userId != null)
-		//	{
-		//		var user = await _userManager.FindByIdAsync(userId);
-		//		feedback.Name = $"{user.FirstName} {user.LastName}";
-		//		feedback.Email = user.Email;
-		//	}
-		//	else
-		//	{
-		//		feedback.Name = dto.Name;
-		//		feedback.Email = dto.Email;
-		//	}
-
-		//	await _context.Feedbacks.AddAsync(feedback);
-		//	await _context.SaveChangesAsync();
-
-		//	return _mapper.Map<FeedbackDto>(feedback);
-		//}
-
-		// في FeedbackService.cs
-		// FeedbackService.cs
 		public async Task<FeedbackDto> CreateFeedbackAsync(CreateFeedbackDto dto, string? userId = null)
 		{
 			var feedback = new Feedback
@@ -67,7 +39,7 @@ namespace velora.services.Services.FeedbackService
 
 			if (!string.IsNullOrEmpty(userId))
 			{
-				feedback.UserId = userId; // تخزين الـ ID فقط بدون علاقة
+				feedback.UserId = userId; 
 				var user = await _userManager.FindByIdAsync(userId);
 				feedback.Name = user != null ? $"{user.FirstName} {user.LastName}" : "Registered User";
 				feedback.Email = user?.Email ?? "no-email@example.com";

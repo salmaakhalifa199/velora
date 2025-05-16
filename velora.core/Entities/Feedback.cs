@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 // Core/Entities/Feedback.cs
 public class Feedback : BaseEntity<int>
 {
-	public string? UserId { get; set; } // يمكن أن تكون null للزوار
+	public string? UserId { get; set; } 
 
 	[Required]
 	public string Name { get; set; }
@@ -21,6 +21,6 @@ public class Feedback : BaseEntity<int>
 	public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 	public bool IsApproved { get; set; }
 
-	// لا تستخدم Navigation property مؤقتاً
+	
 	// public virtual IdentityUser? User { get; set; }
 }

@@ -20,7 +20,7 @@ namespace velora.core.Data.Contexts
 			base.OnModelCreating(modelBuilder);
 			modelBuilder.Entity<Feedback>(entity =>
 			{
-				entity.HasIndex(f => f.UserId); // مجرد index بدون علاقة
+				entity.HasIndex(f => f.UserId);
 			});
 		}
         public DbSet<Product> Products { get; set; }
