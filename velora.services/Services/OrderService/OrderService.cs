@@ -8,7 +8,7 @@ using velora.services.Services.CartService;
 using velora.services.Services.OrderService.Dto;
 using Order = velora.core.Entities.OrderEntities.Order;
 using velora.repository.Specifications.OrderSpecs;
-//using velora.services.Services.PaymentService;
+using velora.services.Services.PaymentService;
 
 namespace velora.services.Services.OrderService
 {
@@ -17,14 +17,14 @@ namespace velora.services.Services.OrderService
         private readonly ICartService _cartService;
         private readonly IUnitWork _unitWork;
         private readonly IMapper _mapper;
-        //private readonly IPaymentService _paymentService;
+        private readonly IPaymentService _paymentService;
 
-        public OrderService(ICartService cartService, IUnitWork unitWork, IMapper mapper)//, IPaymentService paymentService 
+        public OrderService(ICartService cartService, IUnitWork unitWork, IMapper mapper, IPaymentService paymentService) 
         {
             _cartService = cartService;
             _unitWork = unitWork;
             _mapper = mapper;
-            //_paymentService = paymentService;
+            _paymentService = paymentService;
         }
         public async Task<OrderDto> CreateOrderAsync(CreateOrderDto orderDto)
         {
@@ -81,12 +81,12 @@ namespace velora.services.Services.OrderService
 
             #region To Do => Payment
 
-            //var specs = new OrderWithPaymentIntentSpecification(cart.PaymentIntentId);
+            var specs = new OrderWithPaymentIntentSpecification(cart.PaymentIntentId);
 
-            //var existingOrder = await _unitWork.Repository<Order, Guid>().GetByIdWithSpecAsync(specs);
+            var existingOrder = await _unitWork.Repository<Order, Guid>().GetByIdWithSpecAsync(specs);
 
-            //if (existingOrder is null)
-            //    await _paymentService.CreateOrUpdatePaymentIntent(cart);
+            if (existingOrder is null)
+                await _paymentService.CreateOrUpdatePaymentIntent(cart);
 
             #endregion
 
@@ -104,7 +104,7 @@ namespace velora.services.Services.OrderService
                 CartId = orderDto.CartId,
                 OrderItems = mappedOrderItems,
                 Subtotal = subTotal,
-                //PaymentIntentId = cart.PaymentIntentId
+                PaymentIntentId = cart.PaymentIntentId
             };
 
             try

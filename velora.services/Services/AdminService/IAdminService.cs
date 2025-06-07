@@ -29,7 +29,6 @@ namespace velora.services.Services.AdminService
         Task<List<ProductSalesDto>> GetTopSellingProductsAsync();
 		Task<int> GetUsersCountAsync();
 
-		//Task<IEnumerable<UserManagementDto>> GetAllUsersAsync();
 		//Task<UserManagementDto> GetUserByIdAsync(string userId);
 		//Task UpdateUserRoleAsync(string userId, string newRole);
 		//Task DeactivateUserAsync(string userId);

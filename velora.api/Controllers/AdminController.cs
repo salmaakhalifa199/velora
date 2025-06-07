@@ -244,9 +244,6 @@ namespace velora.api.Controllers
         //    return Ok(users);
         //}
 
-        //[HttpGet("users")]
-        //public async Task<IActionResult> GetAllUsers()
-        //    => Ok(await _adminService.GetAllUsers());
 
         //[HttpGet("users/{id}")]
         //public async Task<IActionResult> GetUserById(string id)

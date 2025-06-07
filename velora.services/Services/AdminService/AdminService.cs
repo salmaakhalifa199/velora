@@ -148,19 +148,6 @@ namespace velora.services.Services.AdminService
         //    return _mapper.Map<OrderSummaryDto>(order);
         //}
 
-        //public async Task<IEnumerable<UserManagementDto>> GetAllUsersAsync()
-        //{
-        //    var userRepository = _unitOfWork.Repository();
-
-        //    // Fetch all users from the repository
-        //    var users = await userRepository.GetAllAsync();
-
-        //    // Map the users to UserManagementDto
-        //    var userDtos = _mapper.Map<IEnumerable<UserManagementDto>>(users);
-
-        //    return userDtos;
-        //}
-
         //public async Task<UserManagementDto> GetUserByIdAsync(string userId)
         //{
         //    var userRepository = _unitOfWork.PersonRepository();

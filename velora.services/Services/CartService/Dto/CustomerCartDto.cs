@@ -19,7 +19,7 @@ namespace velora.services.Services.CartService.Dto
         [Required]
         [MinLength(1, ErrorMessage = "Cart must contain at least one item.")]
         public List<CartItemDto> CartItems { get; set; } = new List<CartItemDto>();
-        //public string? PaymentIntentId { get; set; }
-        //public string? ClientSecret { get; set; }
+        public string? PaymentIntentId { get; set; }
+        public string? ClientSecret { get; set; }
     }
 }
