@@ -12,8 +12,8 @@ using velora.core.Data.Contexts;
 namespace velora.core.Migrations.Store
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20250607120818_EditCartRepo")]
-    partial class EditCartRepo
+    [Migration("20250608124033_NotificationTable")]
+    partial class NotificationTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -104,6 +104,37 @@ namespace velora.core.Migrations.Store
                     b.HasKey("Id");
 
                     b.ToTable("ContactsMessages");
+                });
+
+            modelBuilder.Entity("velora.core.Entities.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsGuestOnly")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("velora.core.Entities.OrderEntities.DeliveryMethods", b =>

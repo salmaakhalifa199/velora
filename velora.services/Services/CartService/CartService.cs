@@ -56,6 +56,7 @@ namespace velora.services.Services.CartService
         public async Task AddAsync(CustomerCartDto cartDto)
         {
             var cart = _mapper.Map<CustomerCart>(cartDto);
+            cart.UserId = cartDto.UserId;
             await _cartRepository.AddAsync(cart);
         }
 
@@ -95,6 +96,9 @@ namespace velora.services.Services.CartService
                 cartDto.Id = GenerateRandomCartId();
 
             var cart = _mapper.Map<CustomerCart>(cartDto);
+
+            cart.UserId = cartDto.UserId;
+
             var updatedCart = await _cartRepository.UpdateCartAsync(cart);
             if (updatedCart == null) return null;
 
@@ -108,6 +112,21 @@ namespace velora.services.Services.CartService
 
             return $"BS-{randomDigits}";
 
+        }
+        public async Task<bool> AssignGuestCartToUserAsync(string guestCartId, string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                throw new ArgumentException("UserId cannot be null or empty", nameof(userId));
+
+            var guestCart = await _cartRepository.GetCartAsync(guestCartId);
+            if (guestCart == null) return false;
+
+            guestCart.UserId = userId;
+            guestCart.Id = userId; // save cart under user ID
+
+            await _cartRepository.UpdateCartAsync(guestCart);
+            await _cartRepository.DeleteCartAsync(guestCartId); // cleanup guest cart ID
+            return true;
         }
     }
 }

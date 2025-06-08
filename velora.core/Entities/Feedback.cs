@@ -3,8 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using velora.core.Entities.IdentityEntities;
 using velora.core.Entities;
 using Microsoft.AspNetCore.Identity;
-
-// Core/Entities/Feedback.cs
 public class Feedback : BaseEntity<int>
 {
 	public string? UserId { get; set; } 

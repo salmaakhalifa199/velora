@@ -11,5 +11,6 @@ namespace velora.services.Services.CartService
         Task<bool> AddItemToCartAsync(string cartId, CartItemDto itemDto);
         Task<bool> RemoveItemFromCartAsync(string cartId, string productId);
         Task<bool> ClearCartAsync(string cartId);
+        Task<bool> AssignGuestCartToUserAsync(string guestCartId, string userId);
     }
 }

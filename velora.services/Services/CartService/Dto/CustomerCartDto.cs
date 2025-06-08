@@ -10,7 +10,7 @@ namespace velora.services.Services.CartService.Dto
     public class CustomerCartDto
     {
         public string? Id { get; set; }
-
+        public string? UserId { get; set; }
         public int? DeliveryMethodId { get; set; }
 
         [Range(0, double.MaxValue, ErrorMessage = "Shipping price must be zero or greater.")]

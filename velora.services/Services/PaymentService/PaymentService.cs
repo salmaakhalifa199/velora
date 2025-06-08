@@ -115,6 +115,8 @@ namespace velora.services.Services.PaymentService
                 throw new Exception(" order does not exist");
 
             order.OrderPaymentStatus = OrderPaymentStatus.Received;
+            order.Status = OrderStatus.Placed;
+            order.UpdatedAt = DateTime.UtcNow;
 
             _unitWork.Repository<Order, Guid>().Update(order);
 

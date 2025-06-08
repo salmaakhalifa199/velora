@@ -71,5 +71,17 @@ namespace velora.api.Controllers
             if (!cleared) return BadRequest("Failed to clear cart.");
             return Ok("Cart cleared successfully.");
         }
+
+        [AllowAnonymous]
+        [HttpPost("assign-cart")]
+        public async Task<IActionResult> AssignGuestCartToUser(string guestCartId)
+        {
+            var userId = User?.Identity?.Name; // or get from JWT claim
+            if (userId == null) return Unauthorized();
+
+            var success = await _cartService.AssignGuestCartToUserAsync(guestCartId, userId);
+            if (!success) return BadRequest("Failed to assign cart.");
+            return Ok("Cart assigned to user.");
+        }
     }
 }

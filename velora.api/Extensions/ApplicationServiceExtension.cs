@@ -26,6 +26,7 @@ using velora.services.Services.OrderService;
 using velora.services.Services.FeedbackService;
 using velora.services.Services.UserService.Dto;
 using velora.services.Services.PaymentService;
+using velora.services.Services.NotificationService;
 
 namespace velora.api.Extensions
 {
@@ -43,6 +44,7 @@ namespace velora.api.Extensions
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICartService, CartService>();
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<INotificationService, NotificationService>();
             services.AddAutoMapper(typeof(ContactsProfile));
             services.AddAutoMapper(typeof(OrderProfile));
             services.AddScoped<IOrderService, OrderService>();

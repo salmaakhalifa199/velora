@@ -3,8 +3,8 @@ using velora.api.Controllers;
 
 namespace velora.api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class APIBaseController : ControllerBase
     {
     }

@@ -8,11 +8,11 @@ namespace velora.core.Entities.OrderEntities
 {
     public enum OrderStatus
     {
-        Placed,
-        Pending,
-        Running,
-        Shipped,
-        Delivered,
-        Cancelled
+        Placed = 1,
+        Pending = 2,
+        Running = 3,
+        Shipped = 4,
+        Delivered = 5,
+        Cancelled = 6
     }
 }

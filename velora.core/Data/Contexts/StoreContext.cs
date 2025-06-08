@@ -22,31 +22,35 @@ namespace velora.core.Data.Contexts
 			{
 				entity.HasIndex(f => f.UserId);
 			});
-		}
+            modelBuilder.Entity<Order>()
+           .Property(o => o.Status)
+           .HasDefaultValue(OrderStatus.Placed);
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.OrderPaymentStatus)
+                .HasDefaultValue(OrderPaymentStatus.Pending);
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.UpdatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+        }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductBrand> ProductBrands { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<Contacts> ContactsMessages { get; set; }
         public DbSet<DeliveryMethods> DeliveryMethods { get; set; }
 		public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
 
-
-
-		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             foreach (var entry in ChangeTracker.Entries())
             {
-                var isBaseEntity = entry.Entity?.GetType().BaseType?.IsGenericType == true &&
-                                   entry.Entity.GetType().BaseType.GetGenericTypeDefinition() == typeof(BaseEntity<>);
-
-                if (isBaseEntity && entry.State == EntityState.Modified)
+                if (entry.Entity is BaseEntity<Guid> baseEntity && entry.State == EntityState.Modified)
                 {
-                    var property = entry.Entity.GetType().GetProperty("UpdatedAt");
-                    if (property != null)
-                    {
-                        property.SetValue(entry.Entity, DateTime.UtcNow);
-                    }
+                    baseEntity.UpdatedAt = DateTime.UtcNow;
                 }
             }
 

@@ -31,6 +31,7 @@ namespace velora.repository.Cart
         }
         public async Task<CustomerCart> UpdateCartAsync(CustomerCart cart)
         {
+            var serializedCart = JsonSerializer.Serialize(cart);
             var isCreated = await _database.StringSetAsync(cart.Id, JsonSerializer.Serialize(cart), TimeSpan.FromDays(30));
             if (!isCreated)
                 return null;

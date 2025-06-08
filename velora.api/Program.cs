@@ -42,6 +42,9 @@ namespace velora.api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerDocumentation();
+            builder.Services.AddSwaggerGen();
+
+
 
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
@@ -70,6 +73,7 @@ namespace velora.api
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                app.UseDeveloperExceptionPage();
             }
 
             app.UseMiddleware<ExceptionMiddleware>();

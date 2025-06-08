@@ -15,14 +15,13 @@ namespace velora.core.Entities.OrderEntities
     {
         public string BuyerEmail { get; set; } = string.Empty;
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
-
         public ShippingAddress ShippingAddress { get; set; }
         public DeliveryMethods DeliveryMethod { get; set; }
         public int DeliveryMethodId { get; set; }
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>(); 
         public OrderStatus Status { get; set; } = OrderStatus.Placed;
         public OrderPaymentStatus OrderPaymentStatus { get; set; } = OrderPaymentStatus.Pending;
-        public string PaymentIntentId { get; set; } = string.Empty;
+        public string? PaymentIntentId { get; set; } = string.Empty;
         public string? CartId { get; set; }
         public decimal Subtotal { get; set; }
         public decimal GetTotal()
