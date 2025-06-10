@@ -15,7 +15,6 @@ using velora.services.Services.ContactsService.Dto;
 using velora.services.Services.ProductService;
 using velora.services.Services.ProductService.Dto;
 using velora.services.Services.TokenService;
-using velora.services.Services.UserService;
 using velora.services.Services.CartService.Dto;
 using velora.services.Services.CartService;
 using velora.repository.Cart.Interface;
@@ -27,6 +26,7 @@ using velora.services.Services.FeedbackService;
 using velora.services.Services.UserService.Dto;
 using velora.services.Services.PaymentService;
 using velora.services.Services.NotificationService;
+using velora.services.Services.SkinPrediction;
 
 namespace velora.api.Extensions
 {
@@ -36,6 +36,7 @@ namespace velora.api.Extensions
         {
             services.AddScoped<IUnitWork, UnitWork>();
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+            services.Configure<FlaskApiSettings>(configuration.GetSection("FlaskApiSettings"));
             services.Configure<AuthSettings>(configuration.GetSection("AuthSettings"));
             services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             services.AddScoped<IPersonRepository, PersonRepository>();
@@ -51,9 +52,9 @@ namespace velora.api.Extensions
             services.AddAutoMapper(typeof(ProductProfile).Assembly);
             services.AddAutoMapper(typeof(AdminProfile).Assembly);
             services.AddAutoMapper(typeof(CartProfile).Assembly);
-			services.AddAutoMapper(typeof(FeedbackProfile)); 
-
-			services.AddScoped<ITokenService, TokenService>();
+			services.AddAutoMapper(typeof(FeedbackProfile));
+            services.AddHttpClient<ISkinLesionDetectionService, SkinLesionDetectionService>();
+            services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IAdminService, AdminService>();
