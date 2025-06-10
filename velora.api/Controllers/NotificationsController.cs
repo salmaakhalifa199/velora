@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using velora.services.Services.NotificationService.Dto;
 using velora.services.Services.NotificationService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
 
 namespace velora.api.Controllers
 {
@@ -36,5 +37,27 @@ namespace velora.api.Controllers
                 return StatusCode(500, $"Error: {ex.Message}");
             }
         }
+
+        [HttpGet("user-notifications")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "User")]
+        public async Task<IActionResult> GetUserNotifications()
+        {
+            var userId = User.FindFirst("uid")?.Value ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User ID not found in token.");
+
+            var notifications = await _notificationService.GetUserNotificationsAsync(userId);
+            return Ok(notifications);
+        }
+
+        [HttpGet("guest-notifications")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetGuestNotifications()
+        {
+            var notifications = await _notificationService.GetGuestNotificationsAsync();
+            return Ok(notifications);
+        }
     }
-}
+ }
+

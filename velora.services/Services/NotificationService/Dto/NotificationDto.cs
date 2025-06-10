@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 namespace velora.services.Services.NotificationService.Dto
 {
     public class NotificationDto
+
     {
+        public Guid Id { get; set; }
         [Required]
         public string Title { get; set; }
         [Required]

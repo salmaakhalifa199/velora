@@ -29,7 +29,8 @@ namespace velora.services.Services.NotificationService
             _unitOfWork = unitOfWork;
         }
 
-        public async Task SendToAllUsersAsync(string title, string message)
+        #region Send notification
+ public async Task SendToAllUsersAsync(string title, string message)
         {
             var users = _userManager.Users.ToList();
             foreach (var user in users)
@@ -105,5 +106,48 @@ namespace velora.services.Services.NotificationService
                     throw new ArgumentException("Invalid Target. Allowed values: All, User, Guest.");
             }
         }
+        #endregion
+
+        #region Get notifications
+        public async Task<IEnumerable<UserNotificationDto>> GetUserNotificationsAsync(string userId)
+        {
+            var all = await _notificationRepository.GetAllAsync();
+
+            var userNotifs = all
+                .Where(n =>
+                    // 1. Notifications sent to all users (IsGuestOnly == false && UserId == null)
+                    (n.UserId == null && !n.IsGuestOnly) ||
+                    // 2. Notifications sent to this specific user
+                    (n.UserId == userId && !n.IsGuestOnly)
+                )
+                .OrderByDescending(n => n.CreatedAt)
+                .Select(n => new UserNotificationDto
+                {
+                    Title = n.Title,
+                    Message = n.Message,
+                    CreatedAt = n.CreatedAt
+                });
+
+            return userNotifs;
+        }
+
+        public async Task<IEnumerable<UserNotificationDto>> GetGuestNotificationsAsync()
+        {
+            var all = await _notificationRepository.GetAllAsync();
+
+            var guestNotifs = all
+                .Where(n => n.IsGuestOnly)
+                .OrderByDescending(n => n.CreatedAt)
+                .Select(n => new UserNotificationDto
+                {
+                    Title = n.Title,
+                    Message = n.Message,
+                    CreatedAt = n.CreatedAt
+                });
+
+            return guestNotifs;
+        }
+        #endregion
+
     }
 }

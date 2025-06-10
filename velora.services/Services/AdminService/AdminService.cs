@@ -141,28 +141,6 @@ namespace velora.services.Services.AdminService
         }
         #endregion
 
-
-        //public async Task<List<ProductSalesDto>> GetTopSellingProductsAsync()
-        //{
-        //    var orderItems = await _unitWork.Repository<OrderItem, Guid>().GetAllAsync();
-        //    var products = await _unitWork.Repository<Product, int>().GetAllAsync();
-
-        ////    var topSellingProducts = orderItems
-        //        .Where(item => item.ItemOrdered?.ProductId != null)
-        //        .GroupBy(item => item.ItemOrdered.ProductId)
-        //        .Select(group => new ProductSalesDto
-        //        {
-        //            ProductId = group.Key,
-        //            TotalQuantity = group.Sum(item => item.Quantity)
-        //        })
-        //        .OrderByDescending(product => product.TotalQuantity)
-        //        .Take(10)
-        //        .ToList();
-
-        //    return _mapper.Map<List<ProductSalesDto>>(topSellingProducts);
-     
-        //}
-
     }
 }
 

@@ -13,6 +13,8 @@ namespace velora.services.Services.NotificationService
         Task SendToUserAsync(string title, string message, string emailOrUsername);
         Task SendToGuestsAsync(string title, string message);
         Task SendNotificationAsync(AdminNotificationDto dto);
+        Task<IEnumerable<UserNotificationDto>> GetUserNotificationsAsync(string userId);
+        Task<IEnumerable<UserNotificationDto>> GetGuestNotificationsAsync();
 
     }
 }
