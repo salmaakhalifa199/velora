@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Store.Repository.Interfaces;
+using velora.core.Entities;
 using velora.core.Entities.IdentityEntities;
 using velora.core.Entities.OrderEntities;
 using velora.repository.Interfaces.IdentityInterfaces;
@@ -117,85 +118,50 @@ namespace velora.services.Services.AdminService
         public async Task<List<ProductSalesDto>> GetTopSellingProductsAsync()
         {
             var orderItems = await _unitWork.Repository<OrderItem, Guid>().GetAllAsync();
+            var products = await _unitWork.Repository<Product, int>().GetAllAsync();
 
             var topSellingProducts = orderItems
                 .Where(item => item.ItemOrdered?.ProductId != null)
-                .GroupBy(item => item.ItemOrdered.ProductId)
+                .Join(products,orderItem => orderItem.ItemOrdered.ProductId,product => product.Id,
+                    (orderItem, product) => new { orderItem, product })
+                .GroupBy(x => new { x.product.Id, x.product.Name })
                 .Select(group => new ProductSalesDto
                 {
-                    ProductId = group.Key,
-                    TotalQuantity = group.Sum(item => item.Quantity)
+                ProductId = group.Key.Id,
+                ProductName = group.Key.Name,
+                TotalQuantity = group.Sum(x => x.orderItem.Quantity)
                 })
                 .OrderByDescending(product => product.TotalQuantity)
                 .Take(10)
                 .ToList();
 
-            return _mapper.Map<List<ProductSalesDto>>(topSellingProducts);
+            return topSellingProducts;
+
+
         }
         #endregion
 
-        #region vbn
-        //public async Task<List<OrderSummaryDto>> GetAllOrdersAsync()
+
+        //public async Task<List<ProductSalesDto>> GetTopSellingProductsAsync()
         //{
-        //    var spec = new OrderWithPersonSpec();
-        //    var orders = await _unitWork.Repository<Order, Guid>().GetAllWithSpecAsync(spec);
-        //    return _mapper.Map<List<OrderSummaryDto>>(orders);
+        //    var orderItems = await _unitWork.Repository<OrderItem, Guid>().GetAllAsync();
+        //    var products = await _unitWork.Repository<Product, int>().GetAllAsync();
+
+        ////    var topSellingProducts = orderItems
+        //        .Where(item => item.ItemOrdered?.ProductId != null)
+        //        .GroupBy(item => item.ItemOrdered.ProductId)
+        //        .Select(group => new ProductSalesDto
+        //        {
+        //            ProductId = group.Key,
+        //            TotalQuantity = group.Sum(item => item.Quantity)
+        //        })
+        //        .OrderByDescending(product => product.TotalQuantity)
+        //        .Take(10)
+        //        .ToList();
+
+        //    return _mapper.Map<List<ProductSalesDto>>(topSellingProducts);
+     
         //}
-        //public async Task<OrderSummaryDto> GetOrderByIdAsync(Guid orderId)
-        //{
-        //    var spec = new OrderWithPersonByIdSpec(orderId);
-        //    var order = await _unitWork.Repository<Order, Guid>().GetWithSpecificationByIdAsync(spec);
-        //    return _mapper.Map<OrderSummaryDto>(order);
-        //}
-
-        //public async Task<UserManagementDto> GetUserByIdAsync(string userId)
-        //{
-        //    var userRepository = _unitOfWork.PersonRepository();
-
-        //    var user = await userRepository.GetByIdAsync(userId);
-
-        //    if (user == null)
-        //    {
-        //        throw new Exception($"User with ID {userId} not found.");
-        //    }
-        //    var userDto = _mapper.Map<UserManagementDto>(user);
-
-        //    return userDto;
-        //}
-
-
-        // public async Task UpdateUserRoleAsync(string userId, string newRole)
-        // {
-        //     var user = await _userManager.FindByIdAsync(userId);
-        //     if (user == null)
-        //         throw new Exception("User not found");
-
-        //     var currentRoles = await _userManager.GetRolesAsync(user);
-
-        //     var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
-        //     if (!removeResult.Succeeded)
-        //         throw new Exception("Failed to remove old roles");
-
-        //     var addResult = await _userManager.AddToRoleAsync(user, newRole);
-        //     if (!addResult.Succeeded)
-        //         throw new Exception("Failed to assign new role");
-        // }
-
-
-        //public async Task DeactivateUserAsync(string userId)
-        //{
-        // var user = await _userManager.FindByIdAsync(userId);
-        // if (user == null)
-        //     throw new Exception("User not found");
-
-        // user.IsActive = false;
-
-        // var result = await _userManager.UpdateAsync(user);
-        // if (!result.Succeeded)
-        //     throw new Exception("Failed to deactivate user");
-        //}
-        #endregion
-
 
     }
 }

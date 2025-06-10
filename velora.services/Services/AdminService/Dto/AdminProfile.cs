@@ -41,7 +41,8 @@ namespace velora.services.Services.AdminService.Dto
                 .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status));
 
             CreateMap<OrderItem, ProductSalesDto>()
-               .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ItemOrdered.ProductId))  
+               .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ItemOrdered.ProductId))
+               .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.ItemOrdered.ProductName))
                .ForMember(dest => dest.TotalQuantity, opt => opt.MapFrom(src => src.Quantity));
         }
     }
