@@ -57,7 +57,6 @@ namespace velora.api.Extensions
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IAdminService, AdminService>();
-            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IFeedbackRepository, FeedbackRepository>();
             services.AddScoped<IFeedbackService , FeedbackService>();
 
