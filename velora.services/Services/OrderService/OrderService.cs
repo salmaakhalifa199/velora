@@ -154,18 +154,18 @@ namespace velora.services.Services.OrderService
 
             return mappedOrder;
         }
-        public async Task<bool> UpdateOrderStatusAsync(Guid orderId, OrderStatus status)
+        public async Task<OrderStatus?> UpdateOrderStatusAsync(Guid orderId, OrderStatus status)
         {
             var order = await _unitWork.Repository<Order, Guid>().GetByIdAsync(orderId);
 
-            if (order == null) return false;
+            if (order == null) return null;
 
             order.Status = status;
 
             _unitWork.Repository<Order, Guid>().Update(order);
             await _unitWork.CompleteAsync();
 
-            return true;
+            return order.Status;
         }
 
     }

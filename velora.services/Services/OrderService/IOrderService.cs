@@ -14,6 +14,6 @@ namespace velora.services.Services.OrderService
         Task<IReadOnlyList<OrderDto>> GetAllOrdersForUserAsync(string buyerEmail);
         Task<OrderDto> GetOrderByIdAsync(Guid id, string buyerEmail);
         Task<IReadOnlyList<DeliveryMethods>> GetAllDeliveryMethodsAsync();
-        Task<bool> UpdateOrderStatusAsync(Guid orderId, OrderStatus status);
+        Task<OrderStatus?> UpdateOrderStatusAsync(Guid orderId, OrderStatus status);
     }
 }

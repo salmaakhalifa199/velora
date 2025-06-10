@@ -114,9 +114,11 @@ namespace velora.services.Services.ProductService
             }
 
             product.StockQuantity = stockQuantity;
+
+            await _unitOfWork.CompleteAsync();
             await _unitOfWork.CompleteAsync();
 
-            return true;  
+            return true;
         }
 
         public async Task<bool> DeleteProductAsync(int id)

@@ -53,11 +53,16 @@ namespace velora.api.Controllers
         }
 
         [HttpPut("{orderId}/status")]
-        public async Task<ActionResult> UpdateOrderStatus(Guid orderId, [FromBody] OrderStatus status)
+        public async Task<ActionResult> UpdateOrderStatus(Guid orderId, [FromBody] string status)
         {
-            var result = await _orderService.UpdateOrderStatusAsync(orderId, status);
-            if (!result) return BadRequest("Failed to update order status.");
-            return NoContent();
+            if (!Enum.TryParse<OrderStatus>(status, true, out var parsedStatus))
+                return BadRequest("Invalid status value");
+
+            var updatedStatus = await _orderService.UpdateOrderStatusAsync(orderId, parsedStatus);
+            if (updatedStatus == null)
+                return NotFound();
+
+            return Ok(updatedStatus.ToString());
         }
 
         [HttpGet("delivery-methods")]
