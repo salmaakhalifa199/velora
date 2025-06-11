@@ -15,7 +15,6 @@ namespace velora.services.Services.CartService.Dto
 
         [Range(0, double.MaxValue, ErrorMessage = "Shipping price must be zero or greater.")]
         public decimal ShippingPrice { get; set; }
-        public decimal TotalAmount { get; set; }
 
         [Required]
         [MinLength(1, ErrorMessage = "Cart must contain at least one item.")]

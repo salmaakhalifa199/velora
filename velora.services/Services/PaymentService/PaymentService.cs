@@ -14,37 +14,35 @@ namespace velora.services.Services.PaymentService
     {
         private readonly IConfiguration _configuration;
         private readonly IUnitWork _unitWork;
-        private readonly ICartService _cartService;
+        private readonly ICartService _CartService;
         private readonly IMapper _mapper;
 
-        public PaymentService(
-            IConfiguration configuration,
-            IUnitWork unitWork,
-            ICartService cartService,
-            IMapper mapper)
+        public PaymentService(IConfiguration configuration, IUnitWork unitWork, ICartService cartService, IMapper mapper)
         {
             _configuration = configuration;
             _unitWork = unitWork;
-            _cartService = cartService;
+            _CartService = cartService;
             _mapper = mapper;
         }
-
         public async Task<CustomerCartDto> CreateOrUpdatePaymentIntent(CustomerCartDto cart)
         {
             StripeConfiguration.ApiKey = _configuration["Stripe:Secretkey"];
 
-            if (cart == null)
-                throw new Exception("Cart is empty");
+            if (cart is null)
+                throw new Exception("Basket is Empty");
+
 
             var deliveryMethod = await _unitWork.Repository<DeliveryMethods, int>().GetByIdAsync(cart.DeliveryMethodId.Value);
-            if (deliveryMethod == null)
-                throw new Exception("Delivery method not found");
+
+            if (deliveryMethod is null)
+                throw new Exception("Delivery Method Not Provided");
 
             decimal shippingPrice = deliveryMethod.Price;
 
             foreach (var item in cart.CartItems)
             {
                 var product = await _unitWork.Repository<Product, int>().GetByIdAsync(item.ProductId);
+
                 if (item.Price != product.Price)
                 {
                     item.Price = product.Price;
@@ -52,67 +50,83 @@ namespace velora.services.Services.PaymentService
             }
 
             var service = new PaymentIntentService();
-            PaymentIntent paymentIntent;
 
-            var totalAmount = (long)(cart.CartItems.Sum(i => i.Quantity * i.Price) * 100 + shippingPrice * 100);
+            PaymentIntent paymentIntent;
 
             if (string.IsNullOrEmpty(cart.PaymentIntentId))
             {
                 var options = new PaymentIntentCreateOptions
                 {
-                    Amount = totalAmount,
+                    Amount = (long)cart.CartItems.Sum(item => item.Quantity * (item.Price * 100)) + (long)(shippingPrice * 100),
                     Currency = "usd",
                     PaymentMethodTypes = new List<string> { "card" }
+
                 };
+
                 paymentIntent = await service.CreateAsync(options);
 
                 cart.PaymentIntentId = paymentIntent.Id;
                 cart.ClientSecret = paymentIntent.ClientSecret;
+
             }
             else
             {
                 var options = new PaymentIntentUpdateOptions
                 {
-                    Amount = totalAmount
+                    Amount = (long)cart.CartItems.Sum(item => item.Quantity * (item.Price * 100)) + (long)(shippingPrice * 100),
                 };
+
                 await service.UpdateAsync(cart.PaymentIntentId, options);
             }
+            await _CartService.UpdateCartAsync(cart);
 
-            await _cartService.UpdateCartAsync(cart);
             return cart;
+
+        }
+
+        public async Task<OrderDto> UpdateOrderPaymentFailed(string paymentIntentId)
+        {
+            var specs = new OrderWithPaymentIntentSpecification(paymentIntentId);
+
+            var order = await _unitWork.Repository<Order, Guid>().GetByIdWithSpecAsync(specs);
+
+            if (order is null)
+                throw new Exception(" order does not exist");
+
+            order.OrderPaymentStatus = OrderPaymentStatus.Failed;
+
+            _unitWork.Repository<Order, Guid>().Update(order);
+
+            await _unitWork.CompleteAsync();
+
+            var mapperOrder = _mapper.Map<OrderDto>(order);
+
+            return mapperOrder;
+
         }
 
         public async Task<OrderDto> UpdateOrderPaymentSucceeded(string paymentIntentId)
         {
-            var spec = new OrderWithPaymentIntentSpecification(paymentIntentId);
-            var order = await _unitWork.Repository<Order, Guid>().GetByIdWithSpecAsync(spec);
-            if (order == null)
-                throw new Exception("Order not found");
+            var specs = new OrderWithPaymentIntentSpecification(paymentIntentId);
+
+            var order = await _unitWork.Repository<Order, Guid>().GetByIdWithSpecAsync(specs);
+
+            if (order is null)
+                throw new Exception(" order does not exist");
 
             order.OrderPaymentStatus = OrderPaymentStatus.Received;
             order.Status = OrderStatus.Placed;
             order.UpdatedAt = DateTime.UtcNow;
 
             _unitWork.Repository<Order, Guid>().Update(order);
-            await _unitWork.CompleteAsync();
-            await _cartService.DeleteCartAsync(order.CartId);
 
-            return _mapper.Map<OrderDto>(order);
-        }
-
-        public async Task<OrderDto> UpdateOrderPaymentFailed(string paymentIntentId)
-        {
-            var spec = new OrderWithPaymentIntentSpecification(paymentIntentId);
-            var order = await _unitWork.Repository<Order, Guid>().GetByIdWithSpecAsync(spec);
-            if (order == null)
-                throw new Exception("Order not found");
-
-            order.OrderPaymentStatus = OrderPaymentStatus.Failed;
-
-            _unitWork.Repository<Order, Guid>().Update(order);
             await _unitWork.CompleteAsync();
 
-            return _mapper.Map<OrderDto>(order);
+            await _CartService.DeleteCartAsync(order.CartId);
+
+            var mapperOrder = _mapper.Map<OrderDto>(order);
+
+            return mapperOrder;
         }
     }
 }
