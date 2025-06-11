@@ -27,6 +27,7 @@ using velora.services.Services.UserService.Dto;
 using velora.services.Services.PaymentService;
 using velora.services.Services.NotificationService;
 using velora.services.Services.SkinPrediction;
+using velora.services.Services.UserService;
 
 namespace velora.api.Extensions
 {
@@ -46,6 +47,7 @@ namespace velora.api.Extensions
             services.AddScoped<ICartService, CartService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddAutoMapper(typeof(ContactsProfile));
             services.AddAutoMapper(typeof(OrderProfile));
             services.AddScoped<IOrderService, OrderService>();

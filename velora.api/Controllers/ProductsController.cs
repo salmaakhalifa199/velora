@@ -44,17 +44,6 @@ namespace velora.api.Controllers
 
             return Ok(product);
         }
-        //[HttpPut("update-stock/{id}")]
-        //public async Task<IActionResult> UpdateProductStock(int id, [FromBody] int stockQuantity)
-        //{
-        //    var success = await _productService.UpdateProductStockAsync(id, stockQuantity);
-
-        //    if (!success)
-        //    {
-        //        return NotFound("Product not found.");
-        //    }
-
-        //    return Ok("Product stock updated successfully.");
-        //}
+  
     }
 }
