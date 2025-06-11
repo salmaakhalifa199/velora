@@ -6,6 +6,12 @@ using System.Text.Json.Serialization;
 using StackExchange.Redis;
 using velora.api.MiddleWares;
 using velora.services.Services.FeedbackService;
+using System.Net.Http.Headers;
+using velora.services.Services.SkinPrediction;
+using System.Reflection;
+using Stripe;
+using Microsoft.Extensions.Options;
+using velora.services.Services.PaymentService.Dto;
 
 namespace velora.api
 {
@@ -39,10 +45,14 @@ namespace velora.api
             builder.Services.AddApplicationService(builder.Configuration);
             builder.Services.AddIdentityService(builder.Configuration);
 
+            builder.Services.AddSingleton<IStripeClient>(new StripeClient(builder.Configuration["Stripe:Secretkey"]));
+            builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerDocumentation();
             builder.Services.AddSwaggerGen();
+
 
 
 

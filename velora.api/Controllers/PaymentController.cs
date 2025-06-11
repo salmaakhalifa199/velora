@@ -1,28 +1,55 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Stripe;
 using velora.services.Services.CartService.Dto;
 using velora.services.Services.PaymentService;
-
+using velora.services.Services.PaymentService.Dto;
 namespace velora.api.Controllers
 {
     public class PaymentController : APIBaseController
     {
         private readonly IPaymentService _paymentService;
         private readonly ILogger<PaymentController> _logger;
-        // ✅ Remove the extra space at the end of the secret!
-        const string endpointSecret = "whsec_a3eaa61d94e0e1a153475d809fc7c29fdea130fe4c61a4c2fe927d2cc0adafd6";
+        private readonly IStripeClient _stripeClient;
+        private readonly string _endpointSecret;
 
-        public PaymentController(IPaymentService paymentService, ILogger<PaymentController> logger)
+        public PaymentController(
+            IPaymentService paymentService,
+            ILogger<PaymentController> logger,
+            IStripeClient stripeClient,
+            IOptions<StripeSettings> stripeSettings)
         {
             _paymentService = paymentService;
             _logger = logger;
+            _stripeClient = stripeClient;
+            _endpointSecret = stripeSettings.Value.WebhookSecret;
         }
 
         [HttpPost("create-or-update-intent")]
         public async Task<ActionResult<CustomerCartDto>> CreateOrderUpdatePaymentIntent(CustomerCartDto input)
-            => Ok(await _paymentService.CreateOrUpdatePaymentIntent(input));
+        {
+            var result = await _paymentService.CreateOrUpdatePaymentIntent(input);
+            return Ok(result);
+        }
 
+        [HttpPost("create-payment-intent")]
+        public async Task<IActionResult> CreatePaymentIntent([FromBody] PaymentIntentRequest request)
+        {
+            var options = new PaymentIntentCreateOptions
+            {
+                Amount = request.Amount,
+                Currency = request.Currency,
+                PaymentMethodTypes = new List<string> { "card" }
+            };
+
+            var service = new PaymentIntentService(_stripeClient);
+            var paymentIntent = await service.CreateAsync(options);
+
+            return Ok(new { clientSecret = paymentIntent.ClientSecret });
+        }
+
+        [IgnoreAntiforgeryToken]
         [HttpPost("webhook")]
         public async Task<IActionResult> Webhook()
         {
@@ -36,11 +63,9 @@ namespace velora.api.Controllers
             }
 
             Event stripeEvent;
-
             try
             {
-                // ✅ Construct the Stripe event (this validates the signature)
-                stripeEvent = EventUtility.ConstructEvent(json, stripeSignature, endpointSecret);
+                stripeEvent = EventUtility.ConstructEvent(json, stripeSignature, _endpointSecret);
             }
             catch (StripeException ex)
             {
@@ -50,7 +75,6 @@ namespace velora.api.Controllers
 
             try
             {
-                // ✅ Use switch statement for clarity and safety
                 switch (stripeEvent.Type)
                 {
                     case "payment_intent.succeeded":
@@ -69,15 +93,10 @@ namespace velora.api.Controllers
                         _logger.LogInformation("Order updated to payment failed: {OrderId}", failedOrder.Id);
                         break;
 
-                    case "payment_intent.created":
-                        _logger.LogInformation("Payment intent created.");
-                        break;
-
                     default:
                         _logger.LogWarning("Unhandled Stripe event type: {EventType}", stripeEvent.Type);
                         break;
                 }
-
 
                 return Ok();
             }
