@@ -2,12 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using velora.services.Services.SkinPrediction.Dto;
 using velora.services.Services.SkinPrediction;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 
 namespace velora.api.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
     public class SkinLesionController : APIBaseController
     {
         private readonly ISkinLesionDetectionService _skinLesionDetectionService;
