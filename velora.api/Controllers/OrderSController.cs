@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using velora.api.Extensions;
 using velora.core.Entities.OrderEntities;
 using velora.services.HandlerResponses;
 using velora.services.Services.OrderService;
@@ -30,15 +31,16 @@ namespace velora.api.Controllers
             return Ok(order);
         }
 
-        [HttpPost("myorders")]
-        public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetAllOrdersForUserAsync()
+        [HttpGet("myorders")]
+        public async Task<IActionResult> GetOrdersForUser()
         {
-            var email = User.FindFirstValue(ClaimTypes.Email);
-
+            var email = User?.RetrieveEmailFromPrincipal();
             var orders = await _orderService.GetAllOrdersForUserAsync(email);
 
-            return Ok(orders);
+            if (orders == null || !orders.Any())
+                return NoContent(); // 204 No Content
 
+            return Ok(orders);
         }
 
         [HttpPost("{id}")]

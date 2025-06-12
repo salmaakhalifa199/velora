@@ -133,13 +133,14 @@ namespace velora.services.Services.OrderService
 
             var orders = await _unitWork.Repository<Order, Guid>().GetAllWithSpecAsync(specs);
 
-            if (orders is { Count: <= 0 })
+            if (orders == null || orders.Count <= 0)
                 throw new Exception("You do not have any orders yet!");
 
             var mappedOrders = _mapper.Map<List<OrderDto>>(orders);
 
             return mappedOrders;
         }
+
 
         public async Task<OrderDto> GetOrderByIdAsync(Guid id, string buyerEmail)
         {

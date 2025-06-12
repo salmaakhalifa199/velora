@@ -69,7 +69,8 @@ namespace velora.api
                 options.AddPolicy("AllowFrontend",
                     builder => builder.WithOrigins("http://localhost:5173") // your frontend URL
                                       .AllowAnyHeader()
-                                      .AllowAnyMethod());
+                                      .AllowAnyMethod()
+                                      .AllowCredentials());
             });
 
         
