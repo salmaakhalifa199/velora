@@ -20,7 +20,8 @@ namespace velora.services.Services.OrderService.Dto
                .ForMember(dest => dest.DeliveryMethod, options => options.MapFrom(src => src.DeliveryMethod.ShortName))
                .ForMember(dest => dest.ShippingPrice, options => options.MapFrom(src => src.DeliveryMethod.Price))
                .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status))
-               .ForMember(dest => dest.OrderPaymentStatus, opt => opt.MapFrom(src => src.OrderPaymentStatus));
+               .ForMember(dest => dest.OrderPaymentStatus, opt => opt.MapFrom(src => src.OrderPaymentStatus))
+               .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId)); 
 
             CreateMap<OrderItem, OrderItemDto>()
                .ForMember(dest => dest.ProductId, options => options.MapFrom(src => src.ItemOrdered.ProductId))

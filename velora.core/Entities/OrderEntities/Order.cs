@@ -13,6 +13,7 @@ namespace velora.core.Entities.OrderEntities
 {
     public class Order : BaseEntity<Guid>
     {
+        public string? UserId { get; set; }
         public string BuyerEmail { get; set; } = string.Empty;
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
         public ShippingAddress ShippingAddress { get; set; }

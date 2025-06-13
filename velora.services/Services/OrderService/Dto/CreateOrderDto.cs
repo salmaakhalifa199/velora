@@ -7,6 +7,7 @@ namespace velora.services.Services.OrderService.Dto
         public string CartId { get; set; }
         [EmailAddress]
         public string BuyerEmail { get; set; }
+        public string? UserId { get; set; }
         [Required]
         public AddressDto ShippingAddress { get; set; }
         [Required]

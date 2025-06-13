@@ -12,6 +12,7 @@ namespace velora.services.Services.OrderService.Dto
     {
         public Guid Id { get; set; }
         public string BuyerEmail { get; set; }
+        public string? UserId { get; set; }
         public DateTime OrderDate { get; set; } 
         public AddressDto ShippingAddress { get; set; }
         public string DeliveryMethod { get; set; }

@@ -45,8 +45,10 @@ namespace velora.api
             builder.Services.AddApplicationService(builder.Configuration);
             builder.Services.AddIdentityService(builder.Configuration);
 
-            builder.Services.AddSingleton<IStripeClient>(new StripeClient(builder.Configuration["Stripe:Secretkey"]));
+            //Stripe settings and client configuration
             builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+            builder.Services.AddSingleton<IStripeClient>(new StripeClient(builder.Configuration["Stripe:Secretkey"]));
+         
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -67,7 +69,7 @@ namespace velora.api
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend",
-                    builder => builder.WithOrigins("http://localhost:5173") // your frontend URL
+                    builder => builder.WithOrigins("http://localhost:5173 , http://localhost:5174") // your frontend URL
                                       .AllowAnyHeader()
                                       .AllowAnyMethod()
                                       .AllowCredentials());

@@ -101,6 +101,7 @@ namespace velora.services.Services.OrderService
                 DeliveryMethodId = deliveryMethod.Id,
                 ShippingAddress = mappedShippingAddress,
                 BuyerEmail = orderDto.BuyerEmail,
+                UserId = orderDto.UserId,
                 CartId = orderDto.CartId,
                 OrderItems = mappedOrderItems,
                 Subtotal = subTotal,

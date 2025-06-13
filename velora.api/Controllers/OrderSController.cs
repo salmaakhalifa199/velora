@@ -21,9 +21,9 @@ namespace velora.api.Controllers
         }
 
         [HttpPost]
-
         public async Task<ActionResult<OrderDto>> CreateOrderAsync([FromBody] CreateOrderDto orderDto)
         {
+            orderDto.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var order = await _orderService.CreateOrderAsync(orderDto);
 
             if (order is null)
