@@ -35,7 +35,7 @@ namespace velora.services.Services.AuthService
         {
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user == null)
-                return null;
+                throw new Exception("Email does not exist");
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
             if (!result.Succeeded)
@@ -52,6 +52,7 @@ namespace velora.services.Services.AuthService
 
             return new AuthResponseDto
             {
+                Id = user.Id,   
                 Token = token,
                 Role = actualRole
             };

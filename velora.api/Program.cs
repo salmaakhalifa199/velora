@@ -56,9 +56,6 @@ namespace velora.api
             builder.Services.AddSwaggerGen();
 
 
-
-
-
             builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
             {
                 var configurations = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis"));

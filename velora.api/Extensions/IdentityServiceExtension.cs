@@ -5,6 +5,7 @@ using System.Text;
 using System;
 using velora.core.Entities.IdentityEntities;
 using velora.core.Data.Contexts;
+using System.Security.Claims;
 
 namespace velora.api.Extensions
 {
@@ -32,6 +33,7 @@ namespace velora.api.Extensions
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = _configuration["Token:Issuer"],
                         ValidAudience = _configuration["Token:Audience"],
+                        NameClaimType = ClaimTypes.NameIdentifier,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Token:Key"]))
                     };
                 });

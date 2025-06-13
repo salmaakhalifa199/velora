@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Stripe;
@@ -7,6 +9,7 @@ using velora.services.Services.PaymentService;
 using velora.services.Services.PaymentService.Dto;
 namespace velora.api.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
     public class PaymentController : APIBaseController
     {
         private readonly IPaymentService _paymentService;
@@ -25,10 +28,17 @@ namespace velora.api.Controllers
             _stripeClient = stripeClient;
             _endpointSecret = stripeSettings.Value.WebhookSecret;
         }
-
         [HttpPost("create-or-update-intent")]
         public async Task<ActionResult<CustomerCartDto>> CreateOrderUpdatePaymentIntent(CustomerCartDto input)
         {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID could not be resolved from token.");
+            }
+
+            input.UserId = userId;
             var result = await _paymentService.CreateOrUpdatePaymentIntent(input);
             return Ok(result);
         }
