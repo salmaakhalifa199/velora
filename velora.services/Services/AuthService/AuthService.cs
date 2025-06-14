@@ -52,7 +52,7 @@ namespace velora.services.Services.AuthService
 
             return new AuthResponseDto
             {
-                Id = user.Id,   
+                UserId = user.Id,   
                 Token = token,
                 Role = actualRole
             };

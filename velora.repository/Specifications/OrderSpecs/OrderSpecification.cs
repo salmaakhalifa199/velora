@@ -10,7 +10,7 @@ namespace velora.repository.Specifications.OrderSpecs
     public class OrderSpecification
     {
         public OrderStatus? Status { get; set; }  
-        public Guid? PersonId { get; set; }  
+        public Guid? UserId { get; set; }  
         public string Search { get; set; }  
         public DateTime? OrderDate { get; set; }  
         public string Sort { get; set; }  

@@ -9,8 +9,8 @@ using velora.services.Services.PaymentService;
 using velora.services.Services.PaymentService.Dto;
 namespace velora.api.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
-    public class PaymentController : APIBaseController
+
+    public class PaymentController :APIBaseController
     {
         private readonly IPaymentService _paymentService;
         private readonly ILogger<PaymentController> _logger;
@@ -18,16 +18,17 @@ namespace velora.api.Controllers
         private readonly string _endpointSecret;
 
         public PaymentController(
-            IPaymentService paymentService,
-            ILogger<PaymentController> logger,
-            IStripeClient stripeClient,
-            IOptions<StripeSettings> stripeSettings)
+     IPaymentService paymentService,
+     ILogger<PaymentController> logger,
+     IStripeClient stripeClient,
+     IOptions<StripeSettings> stripeSettings)
         {
             _paymentService = paymentService;
             _logger = logger;
             _stripeClient = stripeClient;
             _endpointSecret = stripeSettings.Value.WebhookSecret;
         }
+
         [HttpPost("create-or-update-intent")]
         public async Task<ActionResult<CustomerCartDto>> CreateOrderUpdatePaymentIntent(CustomerCartDto input)
         {
@@ -59,19 +60,34 @@ namespace velora.api.Controllers
             return Ok(new { clientSecret = paymentIntent.ClientSecret });
         }
 
+        [AllowAnonymous]
         [IgnoreAntiforgeryToken]
         [HttpPost("webhook")]
         public async Task<IActionResult> Webhook()
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-            var stripeSignature = Request.Headers["Stripe-Signature"].FirstOrDefault();
 
+            // ✅ Log the remote IP address (already done, optional)
+            _logger.LogInformation("Received webhook request from: {RemoteIpAddress}", HttpContext.Connection.RemoteIpAddress);
+
+            // ✅ NEW: Log the Stripe-Signature header
+            var stripeSignature = Request.Headers["Stripe-Signature"].FirstOrDefault();
+            _logger.LogInformation("Stripe-Signature: {Signature}", stripeSignature);
+
+            // ✅ Optional: Log all headers
+            foreach (var header in Request.Headers)
+            {
+                _logger.LogInformation("Header: {Key} = {Value}", header.Key, header.Value);
+            }
+
+            // ✅ Check if Stripe-Signature is missing
             if (string.IsNullOrEmpty(stripeSignature))
             {
                 _logger.LogWarning("Missing Stripe-Signature header.");
                 return BadRequest("Missing Stripe-Signature header.");
             }
 
+            // ✅ Use EventUtility to verify
             Event stripeEvent;
             try
             {
@@ -89,22 +105,22 @@ namespace velora.api.Controllers
                 {
                     case "payment_intent.succeeded":
                         var succeededIntent = stripeEvent.Data.Object as PaymentIntent;
-                        _logger.LogInformation("Payment succeeded: {PaymentIntentId}", succeededIntent?.Id);
+                        _logger.LogInformation("✅ Payment succeeded: {PaymentIntentId}", succeededIntent?.Id);
 
                         var succeededOrder = await _paymentService.UpdateOrderPaymentSucceeded(succeededIntent.Id);
-                        _logger.LogInformation("Order updated to payment succeeded: {OrderId}", succeededOrder.Id);
+                        _logger.LogInformation("✅ Order updated to payment succeeded: {OrderId}", succeededOrder.Id);
                         break;
 
                     case "payment_intent.payment_failed":
                         var failedIntent = stripeEvent.Data.Object as PaymentIntent;
-                        _logger.LogInformation("Payment failed: {PaymentIntentId}", failedIntent?.Id);
+                        _logger.LogInformation("❌ Payment failed: {PaymentIntentId}", failedIntent?.Id);
 
                         var failedOrder = await _paymentService.UpdateOrderPaymentFailed(failedIntent.Id);
-                        _logger.LogInformation("Order updated to payment failed: {OrderId}", failedOrder.Id);
+                        _logger.LogInformation("❌ Order updated to payment failed: {OrderId}", failedOrder.Id);
                         break;
 
                     default:
-                        _logger.LogWarning("Unhandled Stripe event type: {EventType}", stripeEvent.Type);
+                        _logger.LogWarning("⚠️ Unhandled Stripe event type: {EventType}", stripeEvent.Type);
                         break;
                 }
 
@@ -112,7 +128,7 @@ namespace velora.api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error handling Stripe event.");
+                _logger.LogError(ex, "💥 Error handling Stripe event.");
                 return StatusCode(500, "Internal Server Error");
             }
         }

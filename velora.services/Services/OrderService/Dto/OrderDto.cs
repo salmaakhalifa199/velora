@@ -21,7 +21,7 @@ namespace velora.services.Services.OrderService.Dto
         public IReadOnlyList<OrderItemDto> OrderItems { get; set; }
         public decimal SubTotal { get; set; }
         public decimal ShippingPrice { get; set; }
-        public decimal Total { get; set; }
+        public decimal TotalAmount { get; set; }
         public string? CartId { get; set; }
         public string? PaymentIntentId { get; set; }
 

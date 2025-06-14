@@ -24,11 +24,21 @@ namespace velora.api.Controllers
         public async Task<ActionResult<OrderDto>> CreateOrderAsync([FromBody] CreateOrderDto orderDto)
         {
             orderDto.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var order = await _orderService.CreateOrderAsync(orderDto);
+            //var order = await _orderService.CreateOrderAsync(orderDto);
 
-            if (order is null)
-                return BadRequest(new ApiResponse<string>(null, false, 400, "Error while creating your order"));
-            return Ok(order);
+            //if (order is null)
+            //    return BadRequest(new ApiResponse<string>(null, false, 400, "Error while creating your order"));
+            //order.TotalAmount = order.OrderItems.Sum(i => i.Price * i.Quantity) + order.ShippingPrice;
+            //return Ok(order);
+            try
+            {
+                var order = await _orderService.CreateOrderAsync(orderDto);
+                return Ok(order);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpGet("myorders")]

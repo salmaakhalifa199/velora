@@ -35,6 +35,8 @@ namespace velora.core.Data.Contexts
             modelBuilder.Entity<Order>()
                 .Property(o => o.UpdatedAt)
                 .HasDefaultValueSql("GETUTCDATE()");
+           
+
 
         }
         public DbSet<Product> Products { get; set; }

@@ -31,6 +31,7 @@ namespace velora.services.Services.TokenService
               new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
               new Claim(ClaimTypes.Email, user.Email),
               new Claim(ClaimTypes.GivenName, user.FirstName),
+              new Claim(ClaimTypes.Surname, user.LastName),
               new Claim("UserName" , user.UserName),
 
             };

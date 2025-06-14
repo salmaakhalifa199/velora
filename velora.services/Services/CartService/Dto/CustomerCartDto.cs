@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using velora.services.Services.OrderService.Dto;
 
 namespace velora.services.Services.CartService.Dto
 {
@@ -22,5 +23,6 @@ namespace velora.services.Services.CartService.Dto
         public List<CartItemDto> CartItems { get; set; } = new List<CartItemDto>();
         public string? PaymentIntentId { get; set; }
         public string? ClientSecret { get; set; }
+        public AddressDto ShippingAddress { get; set; }
     }
 }

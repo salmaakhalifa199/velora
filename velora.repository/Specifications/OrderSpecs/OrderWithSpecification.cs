@@ -12,7 +12,7 @@ namespace velora.repository.Specifications.OrderSpecs
         public OrderWithSpecification(OrderSpecification specs)
        : base(order =>
            (!specs.Status.HasValue || order.Status == specs.Status) &&  
-           (!specs.PersonId.HasValue || order.Id == specs.PersonId) &&  
+           (!specs.UserId.HasValue || order.Id == specs.UserId) &&  
            (string.IsNullOrEmpty(specs.Search) || order.OrderItems.Any(oi => oi.ProductName.Contains(specs.Search))) &&  
            (!specs.OrderDate.HasValue || order.OrderDate >= specs.OrderDate.Value)  
        )

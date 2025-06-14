@@ -32,14 +32,12 @@ namespace velora.services.Services.OrderService
             if (cart is null)
                 throw new Exception("Cart Not Exist");
 
-
             #region Fill order item list with items in the basket 
-
             var orderItems = new List<OrderItemDto>();
 
             foreach (var cartitem in cart.CartItems)
             {
-                int productId = cartitem.ProductId; 
+                int productId = cartitem.ProductId;
                 var productItem = await _unitWork.Repository<Product, int>().GetByIdAsync(productId);
 
                 if (productItem is null)
@@ -61,68 +59,59 @@ namespace velora.services.Services.OrderService
 
                 var mapperOrderItem = _mapper.Map<OrderItemDto>(orderItem);
                 orderItems.Add(mapperOrderItem);
-
             }
-
             #endregion
 
             #region Get Delivery Method
-
             var deliveryMethod = await _unitWork.Repository<DeliveryMethods, int>().GetByIdAsync(orderDto.DeliveryMethodId);
-
             if (deliveryMethod is null)
                 throw new Exception("Delivery Method Not Provided");
-
             #endregion
 
             #region Calculate SubTotal
             var subTotal = orderItems.Sum(item => item.Quantity * item.Price);
             #endregion
 
-            #region To Do => Payment
-
+            #region Check Existing Order by PaymentIntentId
             var specs = new OrderWithPaymentIntentSpecification(cart.PaymentIntentId);
-
             var existingOrder = await _unitWork.Repository<Order, Guid>().GetByIdWithSpecAsync(specs);
 
-            if (existingOrder is null)
-                await _paymentService.CreateOrUpdatePaymentIntent(cart);
+            if (existingOrder != null)
+            {
+                existingOrder.ShippingAddress = _mapper.Map<ShippingAddress>(orderDto.ShippingAddress);
+                existingOrder.DeliveryMethodId = deliveryMethod.Id;
+                existingOrder.Subtotal = subTotal;
+                existingOrder.OrderItems = _mapper.Map<List<OrderItem>>(orderItems);
 
+                _unitWork.Repository<Order, Guid>().Update(existingOrder);
+                await _unitWork.CompleteAsync();
+                return _mapper.Map<OrderDto>(existingOrder);
+            }
             #endregion
 
-            #region Create Order
+            #region Create Payment Intent
+            await _paymentService.CreateOrUpdatePaymentIntent(cart);
+            #endregion
 
-            var mappedShippingAddress = _mapper.Map<ShippingAddress>(orderDto.ShippingAddress);
-
-            var mappedOrderItems = _mapper.Map<List<OrderItem>>(orderItems);
-
+            #region Create New Order
             var order = new Order
             {
                 DeliveryMethodId = deliveryMethod.Id,
-                ShippingAddress = mappedShippingAddress,
+                ShippingAddress = _mapper.Map<ShippingAddress>(orderDto.ShippingAddress),
                 BuyerEmail = orderDto.BuyerEmail,
                 UserId = orderDto.UserId,
                 CartId = orderDto.CartId,
-                OrderItems = mappedOrderItems,
+                OrderItems = _mapper.Map<List<OrderItem>>(orderItems),
                 Subtotal = subTotal,
                 PaymentIntentId = cart.PaymentIntentId
             };
 
-            try
-            {
-                await _unitWork.Repository<Order, Guid>().AddAsync(order);
-                await _unitWork.CompleteAsync();
-                var mappedOrder = _mapper.Map<OrderDto>(order);
-                return mappedOrder;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException?.Message); 
-                throw new Exception(ex.Message);
-            }
+            await _unitWork.Repository<Order, Guid>().AddAsync(order);
+            await _unitWork.CompleteAsync();
+            return _mapper.Map<OrderDto>(order);
             #endregion
-
         }
+
 
         public async Task<IReadOnlyList<DeliveryMethods>> GetAllDeliveryMethodsAsync()
         => await _unitWork.Repository<DeliveryMethods, int>().GetAllAsync();

@@ -19,6 +19,8 @@ namespace velora.services.Seeders
 
             string userEmail = config["Seeding:DefaultUser:Email"];
             string userPassword = config["Seeding:DefaultUser:Password"];
+            string firstName = config["Seeding:DefaultUser:FirstName"];
+            string lastName = config["Seeding:DefaultUser:LastName"];
             await CreateUserIfNotExists(userManager, roleManager, userEmail, userPassword, "User", logger);
 
             string adminEmail = config["Seeding:AdminUser:Email"];
@@ -28,6 +30,8 @@ namespace velora.services.Seeders
 
         private static async Task CreateUserIfNotExists(UserManager<Person> userManager, RoleManager<IdentityRole> roleManager, string email, string password, string role, ILogger logger)
         {
+   
+
             var existingUser = await userManager.FindByEmailAsync(email);
             if (existingUser == null)
             {
@@ -36,8 +40,8 @@ namespace velora.services.Seeders
                     UserName = email,
                     Email = email,
                     EmailConfirmed = true,
-                    FirstName = "Default",  
-                    LastName = "User"
+                    FirstName = "firstName",  
+                    LastName = "LastName"
                 };
 
                 var result = await userManager.CreateAsync(newUser, password);

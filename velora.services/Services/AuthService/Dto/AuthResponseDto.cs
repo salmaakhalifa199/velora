@@ -8,7 +8,7 @@ namespace velora.services.Services.AuthService.Dto
 {
     public class AuthResponseDto
     {
-        public string Id { get; set; }
+        public string UserId { get; set; }
         public string Token { get; set; }
         public string Role { get; set; }
     }
