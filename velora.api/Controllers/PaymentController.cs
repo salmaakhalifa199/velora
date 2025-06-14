@@ -9,7 +9,7 @@ using velora.services.Services.PaymentService;
 using velora.services.Services.PaymentService.Dto;
 namespace velora.api.Controllers
 {
-
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PaymentController :APIBaseController
     {
         private readonly IPaymentService _paymentService;
