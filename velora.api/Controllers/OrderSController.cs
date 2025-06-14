@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Store.Repository.Interfaces;
 using System.Security.Claims;
 using velora.api.Extensions;
 using velora.core.Entities.OrderEntities;
@@ -14,22 +16,20 @@ namespace velora.api.Controllers
     public class OrderSController : APIBaseController
     {
         private readonly IOrderService _orderService;
-
-        public OrderSController(IOrderService orderService )
+        private readonly IUnitWork _unitWork;
+        private readonly IMapper _mapper;
+        public OrderSController(IOrderService orderService , IUnitWork unitWork, IMapper mapper)
         {
             _orderService = orderService;
+            _unitWork = unitWork;
+            _mapper = mapper;
         }
 
         [HttpPost]
         public async Task<ActionResult<OrderDto>> CreateOrderAsync([FromBody] CreateOrderDto orderDto)
         {
             orderDto.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            //var order = await _orderService.CreateOrderAsync(orderDto);
-
-            //if (order is null)
-            //    return BadRequest(new ApiResponse<string>(null, false, 400, "Error while creating your order"));
-            //order.TotalAmount = order.OrderItems.Sum(i => i.Price * i.Quantity) + order.ShippingPrice;
-            //return Ok(order);
+        
             try
             {
                 var order = await _orderService.CreateOrderAsync(orderDto);
@@ -75,6 +75,8 @@ namespace velora.api.Controllers
                 return NotFound();
 
             return Ok(updatedStatus.ToString());
+
+
         }
 
         [HttpGet("delivery-methods")]

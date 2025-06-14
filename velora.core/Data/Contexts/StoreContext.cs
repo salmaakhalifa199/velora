@@ -25,12 +25,12 @@ namespace velora.core.Data.Contexts
             modelBuilder.Entity<Order>()
            .Property(o => o.Status)
            .HasConversion<string>()
-           .HasDefaultValue(OrderStatus.Placed);
+           .HasDefaultValue(OrderStatus.Placed); 
 
             modelBuilder.Entity<Order>()
                 .Property(o => o.OrderPaymentStatus)
-                 .HasConversion<string>()
-                .HasDefaultValue(OrderPaymentStatus.Pending);
+                .HasConversion<string>();
+
 
             modelBuilder.Entity<Order>()
                 .Property(o => o.UpdatedAt)

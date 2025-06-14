@@ -66,7 +66,7 @@ namespace velora.api
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend",
-                    builder => builder.WithOrigins("http://localhost:5173 , http://localhost:5174") // your frontend URL
+                    builder => builder.WithOrigins("http://localhost:5173" , "http://localhost:5174") // your frontend URL
                                       .AllowAnyHeader()
                                       .AllowAnyMethod()
                                       .AllowCredentials());

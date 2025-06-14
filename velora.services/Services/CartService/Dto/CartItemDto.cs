@@ -26,12 +26,6 @@ namespace velora.services.Services.CartService.Dto
         [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1.")]
         public int Quantity { get; set; }
 
-        //public int ProductCategoryId { get; set; }
-        //public int ProductBrandId { get; set; }
-        //public string SkinType { get; set; }
-        //public bool IsBestSeller { get; set; }
-        //public int SalesCount { get; set; }
-        //[Required]
         public string BrandName { get; set; }
         [Required]
         public string CategoryName { get; set; }

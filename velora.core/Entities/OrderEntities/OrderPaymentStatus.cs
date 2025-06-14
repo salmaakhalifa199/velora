@@ -9,7 +9,8 @@ namespace velora.core.Entities.OrderEntities
     public enum OrderPaymentStatus
     {
         Pending  = 1,
-        Received = 2,
-        Failed = 3
+        Paid = 2,
+        Received = 3,
+        Failed = 4
     }
 }

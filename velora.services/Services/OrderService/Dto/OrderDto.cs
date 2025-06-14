@@ -16,8 +16,8 @@ namespace velora.services.Services.OrderService.Dto
         public DateTime OrderDate { get; set; } 
         public AddressDto ShippingAddress { get; set; }
         public string DeliveryMethod { get; set; }
-        public OrderStatus OrderStatus { get; set; } 
-        public OrderPaymentStatus OrderPaymentStatus { get; set; } 
+        public OrderStatus? OrderStatus { get; set; } 
+        public OrderPaymentStatus? OrderPaymentStatus { get; set; } 
         public IReadOnlyList<OrderItemDto> OrderItems { get; set; }
         public decimal SubTotal { get; set; }
         public decimal ShippingPrice { get; set; }

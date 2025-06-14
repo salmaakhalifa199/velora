@@ -59,6 +59,27 @@ namespace velora.api.Controllers
 
             return Ok(new { clientSecret = paymentIntent.ClientSecret });
         }
+        private async Task ProcessStripeEventAsync(Event stripeEvent)
+        {
+            try
+            {
+                switch (stripeEvent.Type)
+                {
+                    case "payment_intent.succeeded":
+                        var intent = stripeEvent.Data.Object as PaymentIntent;
+                        await _paymentService.UpdateOrderPaymentSucceeded(intent.Id);
+                        break;
+                    case "payment_intent.payment_failed":
+                        // handle failure
+                        break;
+                        // other event types...
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing Stripe event");
+            }
+        }
 
         [AllowAnonymous]
         [IgnoreAntiforgeryToken]
@@ -74,11 +95,11 @@ namespace velora.api.Controllers
             var stripeSignature = Request.Headers["Stripe-Signature"].FirstOrDefault();
             _logger.LogInformation("Stripe-Signature: {Signature}", stripeSignature);
 
-            // ✅ Optional: Log all headers
-            foreach (var header in Request.Headers)
-            {
-                _logger.LogInformation("Header: {Key} = {Value}", header.Key, header.Value);
-            }
+            //// ✅ Optional: Log all headers
+            //foreach (var header in Request.Headers)
+            //{
+            //    _logger.LogInformation("Header: {Key} = {Value}", header.Key, header.Value);
+            //}
 
             // ✅ Check if Stripe-Signature is missing
             if (string.IsNullOrEmpty(stripeSignature))
@@ -98,6 +119,9 @@ namespace velora.api.Controllers
                 _logger.LogError("Stripe webhook signature verification failed: {Message}", ex.Message);
                 return BadRequest("Stripe signature verification failed.");
             }
+
+            // Fire-and-forget background handling
+            await ProcessStripeEventAsync(stripeEvent);
 
             try
             {

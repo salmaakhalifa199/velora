@@ -10,6 +10,7 @@ using velora.services.Services.CartService.Dto;
 using velora.services.Services.OrderService.Dto;
 using velora.Repository.Repositories;
 using velora.repository.Cart.Models;
+using Microsoft.Extensions.Logging;
 namespace velora.services.Services.PaymentService
 {
     public class PaymentService : IPaymentService
@@ -17,12 +18,14 @@ namespace velora.services.Services.PaymentService
         private readonly IConfiguration _configuration;
         private readonly IUnitWork _unitWork;
         private readonly ICartService _cartService;
+        private readonly ILogger<PaymentService> _logger;
 
-        public PaymentService(IConfiguration configuration, IUnitWork unitWork, ICartService cartService)
+        public PaymentService(IConfiguration configuration, IUnitWork unitWork, ICartService cartService, ILogger<PaymentService> logger)
         {
             _configuration = configuration;
             _unitWork = unitWork;
             _cartService = cartService;
+            _logger = logger;
         }
 
         public async Task<CustomerCartDto> CreateOrUpdatePaymentIntent(CustomerCartDto cart)
@@ -77,26 +80,22 @@ namespace velora.services.Services.PaymentService
 
         public async Task<Order> UpdateOrderPaymentSucceeded(string paymentIntentId)
         {
-            var orders = (await _unitWork.Repository<Order, Guid>().GetAllAsync())
-        .Where(o => o.PaymentIntentId == paymentIntentId)
-        .ToList();
+            if (string.IsNullOrEmpty(paymentIntentId))
+                throw new Exception("Invalid paymentIntentId");
 
-            if (orders.Count == 0)
+            var order = await _unitWork.Repository<Order, Guid>()
+                .GetByIdWithSpecAsync(new OrderWithPaymentIntentSpecification(paymentIntentId));
+
+            if (order == null)
             {
-                // No matching order
-                return null;
+                _logger.LogError($"Order not found for PaymentIntentId: {paymentIntentId}");
+                throw new Exception($"Order not found for PaymentIntentId: {paymentIntentId}");
             }
 
-            if (orders.Count > 1)
-            {
-                // ❌ Duplicate problem: you can log a warning, or handle it as needed
-                throw new InvalidOperationException($"Multiple orders found with PaymentIntentId {paymentIntentId}");
-            }
-
-            var order = orders.First(); // ✅ Now safe
-
-            order.Status = OrderStatus.Placed; // or whatever your enum is
+            order.OrderPaymentStatus = OrderPaymentStatus.Received;
+            order.Status = OrderStatus.Confirmed; // Better than 'Placed'
             order.UpdatedAt = DateTime.UtcNow;
+
             _unitWork.Repository<Order, Guid>().Update(order);
             await _unitWork.CompleteAsync();
 
@@ -105,17 +104,23 @@ namespace velora.services.Services.PaymentService
 
         public async Task<Order> UpdateOrderPaymentFailed(string paymentIntentId)
         {
-            if (string.IsNullOrEmpty(paymentIntentId))
-                throw new Exception("Invalid PaymentIntentId");
 
-            var orders = await _unitWork.Repository<Order, Guid>().GetAllAsync();
-            var order = orders.FirstOrDefault(o => o.PaymentIntentId == paymentIntentId);
+            var repo = _unitWork.Repository<Order, Guid>();
+
+            var spec = new OrderWithPaymentIntentSpecification(paymentIntentId);
+            var order = await repo.GetByIdWithSpecAsync(spec);
 
             if (order == null)
-                throw new Exception("Order not found");
+            {
+                throw new Exception($"No order found for PaymentIntentId: {paymentIntentId}");
+            }
 
             order.OrderPaymentStatus = OrderPaymentStatus.Failed;
+            order.Status = OrderStatus.Cancelled;
+
+            repo.Update(order);
             await _unitWork.CompleteAsync();
+
             return order;
         }
    

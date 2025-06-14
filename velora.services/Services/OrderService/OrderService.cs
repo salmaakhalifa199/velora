@@ -82,6 +82,8 @@ namespace velora.services.Services.OrderService
                 existingOrder.DeliveryMethodId = deliveryMethod.Id;
                 existingOrder.Subtotal = subTotal;
                 existingOrder.OrderItems = _mapper.Map<List<OrderItem>>(orderItems);
+                existingOrder.Status = OrderStatus.Placed;
+                existingOrder.OrderPaymentStatus = orderDto.OrderPaymentStatus;
 
                 _unitWork.Repository<Order, Guid>().Update(existingOrder);
                 await _unitWork.CompleteAsync();
@@ -90,7 +92,7 @@ namespace velora.services.Services.OrderService
             #endregion
 
             #region Create Payment Intent
-            await _paymentService.CreateOrUpdatePaymentIntent(cart);
+            var paymentIntent = await _paymentService.CreateOrUpdatePaymentIntent(cart);
             #endregion
 
             #region Create New Order
@@ -103,7 +105,9 @@ namespace velora.services.Services.OrderService
                 CartId = orderDto.CartId,
                 OrderItems = _mapper.Map<List<OrderItem>>(orderItems),
                 Subtotal = subTotal,
-                PaymentIntentId = cart.PaymentIntentId
+                PaymentIntentId = paymentIntent.Id, // 🔴 Important
+                Status = OrderStatus.Placed,
+                OrderPaymentStatus = orderDto.OrderPaymentStatus
             };
 
             await _unitWork.Repository<Order, Guid>().AddAsync(order);

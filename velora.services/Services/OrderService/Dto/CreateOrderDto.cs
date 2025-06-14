@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using velora.core.Entities.OrderEntities;
 
 namespace velora.services.Services.OrderService.Dto
 {
@@ -12,5 +13,6 @@ namespace velora.services.Services.OrderService.Dto
         public AddressDto ShippingAddress { get; set; }
         [Required]
         public int DeliveryMethodId { get; set; }
+        public OrderPaymentStatus? OrderPaymentStatus { get; set; } 
     }
 }

@@ -13,7 +13,8 @@ namespace velora.repository.Specifications.OrderSpecs
         public OrderWithPaymentIntentSpecification(string? paymentIntentId) 
             : base(order => order.PaymentIntentId == paymentIntentId)
         {
-
+            AddInclude(o => o.DeliveryMethod);
+            AddInclude(o => o.OrderItems);
         }
     }
 }
