@@ -7,6 +7,6 @@ Built the backend using **ASP.NET Core Web API**, with support for:
 - Secure APIs for authentication, product/catalog management, and order processing
 - Machine learning inference via `/predict` endpoint (CNN on HAM10000 dataset)
 - Integration with **Stripe API** for secure payments
-- Admin dashboard: user feedback, sales analytics, and system notifications
+- Admin dashboard: user feedback, sales analytics, Crud Product , Order Status managment and system notifications
 
 **Tech Stack:** ASP.NET Core, EF Core, SQL Server, JWT, Stripe API
