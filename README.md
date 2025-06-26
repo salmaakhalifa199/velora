@@ -10,3 +10,4 @@ Built the backend using **ASP.NET Core Web API**, with support for:
 - Admin dashboard: user feedback, sales analytics, Crud Product , Order Status managment and system notifications
 
 **Tech Stack:** ASP.NET Core, EF Core, SQL Server, JWT, Stripe API
+![Apis](https://github.com/user-attachments/assets/4076917a-7d6b-45ea-8be7-680377f52887)
